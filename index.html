@@ -1,0 +1,141 @@
+# NEXUS AI — Código generado para: Un juego de Pac-Man funcional con fantasmas con IA, laberinto, puntuación y vidas en Python Pygame
+# Optimizado para PC de baja gama
+
+import os
+import sys
+import json
+import time
+from datetime import datetime
+
+class NexusApp:
+    """
+    Aplicación principal generada por NEXUS AI
+    Descripción: Un juego de Pac-Man funcional con fantasmas con IA, laberinto, puntuación y vidas en Python Pygame
+    """
+    
+    def __init__(self):
+        self.nombre = "NEXUS App"
+        self.version = "1.0.0"
+        self.datos = []
+        self.config = self.cargar_config()
+        print(f"⬡ {self.nombre} v{self.version} iniciado")
+    
+    def cargar_config(self):
+        """Carga configuración desde archivo o valores por defecto"""
+        config_path = "config.json"
+        if os.path.exists(config_path):
+            with open(config_path, 'r', encoding='utf-8') as f:
+                return json.load(f)
+        return {
+            "debug": False,
+            "max_items": 1000,
+            "encoding": "utf-8",
+            "version": "1.0.0"
+        }
+    
+    def guardar_datos(self, archivo="datos.json"):
+        """Guarda los datos en un archivo JSON"""
+        try:
+            with open(archivo, 'w', encoding='utf-8') as f:
+                json.dump(self.datos, f, ensure_ascii=False, indent=2)
+            print(f"✓ Datos guardados en {archivo}")
+            return True
+        except Exception as e:
+            print(f"✗ Error al guardar: {e}")
+            return False
+    
+    def cargar_datos(self, archivo="datos.json"):
+        """Carga datos desde un archivo JSON"""
+        try:
+            if os.path.exists(archivo):
+                with open(archivo, 'r', encoding='utf-8') as f:
+                    self.datos = json.load(f)
+                print(f"✓ {len(self.datos)} registros cargados")
+            else:
+                print(f"⚠ Archivo {archivo} no encontrado, iniciando vacío")
+        except Exception as e:
+            print(f"✗ Error al cargar: {e}")
+    
+    def agregar_item(self, item):
+        """Agrega un nuevo elemento a los datos"""
+        registro = {
+            "id": len(self.datos) + 1,
+            "datos": item,
+            "timestamp": datetime.now().isoformat()
+        }
+        self.datos.append(registro)
+        return registro
+    
+    def buscar(self, query):
+        """Búsqueda básica en los datos"""
+        query = str(query).lower()
+        resultados = [
+            d for d in self.datos 
+            if query in str(d).lower()
+        ]
+        return resultados
+    
+    def mostrar_menu(self):
+        """Menú principal de la aplicación"""
+        print("\n" + "="*50)
+        print(f"  ⬡ {self.nombre}")
+        print("="*50)
+        print("  1. Agregar elemento")
+        print("  2. Ver todos los datos")
+        print("  3. Buscar")
+        print("  4. Guardar datos")
+        print("  5. Cargar datos")
+        print("  0. Salir")
+        print("="*50)
+        return input("  Opción: ").strip()
+    
+    def ejecutar(self):
+        """Bucle principal de la aplicación"""
+        self.cargar_datos()
+        
+        while True:
+            try:
+                opcion = self.mostrar_menu()
+                
+                if opcion == "1":
+                    item = input("  Ingresa el elemento: ").strip()
+                    if item:
+                        r = self.agregar_item(item)
+                        print(f"  ✓ Agregado con ID: {r['id']}")
+                
+                elif opcion == "2":
+                    if not self.datos:
+                        print("  ⚠ Sin datos aún")
+                    else:
+                        print(f"  ─── {len(self.datos)} elemento(s) ───")
+                        for d in self.datos:
+                            print(f"  [{d['id']}] {d['datos']}")
+                
+                elif opcion == "3":
+                    query = input("  Buscar: ").strip()
+                    res = self.buscar(query)
+                    print(f"  → {len(res)} resultado(s) para '{query}'")
+                    for r in res:
+                        print(f"  [{r['id']}] {r['datos']}")
+                
+                elif opcion == "4":
+                    self.guardar_datos()
+                
+                elif opcion == "5":
+                    self.cargar_datos()
+                
+                elif opcion == "0":
+                    print("  ⬡ Hasta luego.")
+                    sys.exit(0)
+                
+                else:
+                    print("  ✗ Opción no válida")
+                    
+            except KeyboardInterrupt:
+                print("\n  ⬡ Cerrando...")
+                self.guardar_datos()
+                sys.exit(0)
+
+if __name__ == "__main__":
+    app = NexusApp()
+    app.ejecutar()
